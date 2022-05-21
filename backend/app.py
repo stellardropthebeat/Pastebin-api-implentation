@@ -2,6 +2,7 @@ import sys
 import json
 
 import flask
+import config
 from flask import Flask, request, jsonify
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime
@@ -15,7 +16,8 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # Define the MariaDB engine using MariaDB Connector/Python
-engine = sqlalchemy.create_engine("mariadb+mariadbconnector://root:hardpass@127.0.0.1:3307/test")
+engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + config.user + ":" + config.password + "@127.0.0.1"
+                                                                                                        ":3307/test")
 
 Base = declarative_base()
 
