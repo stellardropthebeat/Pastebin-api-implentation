@@ -1,41 +1,94 @@
 import sys
 import json
-import mariadb
-import flask
-from flask import Flask
 
+import flask
+from flask import Flask, request, jsonify
+from datetime import datetime
+from sqlalchemy import Column, Text, DateTime
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import declarative_base
+import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-# configuration used to connect to MariaDB
-config = {
-    'host': '127.0.0.1',
-    'port': 3307,
-    'user': 'root',
-    'password': 'hardpass',
-    'database': 'test'
-}
+# Define the MariaDB engine using MariaDB Connector/Python
+engine = sqlalchemy.create_engine("mariadb+mariadbconnector://root:hardpass@127.0.0.1:3307/test")
+
+Base = declarative_base()
 
 
-@app.route('/api/people', methods=['GET'])
+class Paste(Base):
+    __tablename__ = 'pastebin'
+    id = Column(Integer, primary_key=True)
+    title = Column(String(length=100))
+    content = Column(Text)
+    createdAt = Column(DateTime)
+
+
+Base.metadata.create_all(engine)
+
+# Create a session
+Session = sqlalchemy.orm.sessionmaker()
+Session.configure(bind=engine)
+session = Session()
+
+
+def addPaste(title, content, createdAt):
+    newPaste = Paste(title=title, content=content, createdAt=createdAt)
+    session.add(newPaste)
+    session.commit()
+    return newPaste.id
+
+
+def selectById(Id):
+    return session.query(Paste).get(Id)
+
+
+def selectRecents():
+    recents = session.query(Paste).order_by(Paste.id.desc()).limit(100)
+    toReturn = []
+    for p in recents:
+        toReturn.append(({"title": p.title, "content": p.content, "createdAt": str(p.createdAt)}))
+    return toReturn
+
+
+@app.route('/')
 def index():
-    # Connection to Mariadb
-    con = mariadb.connect(**config)
-    # create a connection cursor
-    cur = con.cursor()
-    # execute a SQL statement
-    cur.execute("select * from people")
+    return "Hello World"
 
-    # serialize results into JSON
-    row_headers = [x[0] for x in cur.description]
-    rv = cur.fetchall()
-    json_data = []
-    for result in rv:
-        json_data.append(dict(zip(row_headers, result)))
 
-    # return the results!
-    return json.dumps(json_data)
+@app.route('/api/paste', methods=['POST'])
+def paste():
+    try:
+        title = request.json["title"]
+        content = request.json["content"]
+        dt = datetime.now()
+        toReturn = jsonify({"id": addPaste(title, content, dt)})
+    except:
+        toReturn = None
+    if toReturn is None:
+        return jsonify({"error": "No title or content"}), 400
+    else:
+        return toReturn, 200
+
+
+@app.route('/api/<Id>', methods=["GET"])
+def getId(Id):
+    paste = selectById(Id)
+    if paste is None:
+        return '', 404
+    else:
+        return jsonify(
+            {"title": paste.title, "content": paste.content, "createdAt": str(paste.createdAt)}
+        ), 200
+
+
+@app.route('/api/recents', methods=["POST"])
+def getRecents():
+    return json.dumps(selectRecents())
 
 
 app.run()
