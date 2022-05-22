@@ -1,14 +1,10 @@
-import sys
 import json
-
-import flask
 import config
 from flask import Flask, request, jsonify
 from datetime import datetime
-from sqlalchemy import Column, Text, DateTime
-from sqlalchemy import Integer
-from sqlalchemy import String
+from sqlalchemy import Column, Text, DateTime, Integer, String, create_engine
 from sqlalchemy.orm import declarative_base
+from sqlalchemy_utils import database_exists, create_database
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -18,6 +14,12 @@ app.config["DEBUG"] = True
 # Define the MariaDB engine using MariaDB Connector/Python
 engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + config.user + ":" + config.password + "@127.0.0.1"
                                                                                                         ":3307/test")
+# Create database if it does not exist.
+if not database_exists(engine.url):
+    create_database(engine.url)
+else:
+    # Connect the database if exists.
+    engine.connect()
 
 Base = declarative_base()
 
