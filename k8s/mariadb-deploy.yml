@@ -6,17 +6,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mariadb-deploy
+      app: mariadb
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: mariadb-deploy
+        app: mariadb
     spec:
       containers:
       - image: mariadb
-        name: mariadb-deploy
+        name: mariadb
         env:
           - name: MARIADB_USER
             valueFrom:
