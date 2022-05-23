@@ -1,4 +1,6 @@
 import json
+import os
+
 import config
 from flask import Flask, request, jsonify
 from datetime import datetime
@@ -12,8 +14,8 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # Define the MariaDB engine using MariaDB Connector/Python
-engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + config.user + ":" + config.password + "@127.0.0.1"
-                                                                                                        ":3307/test")
+engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"])
+
 # Create database if it does not exist.
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -95,4 +97,4 @@ def getRecents():
     return json.dumps(selectRecents())
 
 
-app.run()
+app.run(host='0.0.0.0', port=5000, debug=True)
