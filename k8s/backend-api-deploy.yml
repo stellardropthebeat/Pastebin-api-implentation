@@ -16,8 +16,22 @@ spec:
     spec:
       containers:
       - name: backend-api
-        image: ghcr.io/cs-muic/scalable-p1-stellardropthebeat/p1-backend
-        # TODO connect database to backend
+        image: ghcr.io/cs-muic/scalable-p1-stellardropthebeat/p1-backend:latest
         env:
-        - name: ELASTIC_HOST
-          value: elasticsearch.default.svc
+          - name: MARIADB_USER
+            valueFrom:
+              secretKeyRef:
+                name: secret
+                key: user
+          - name: MARIADB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secret
+                key: password
+          - name: MARIADB_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: mariadb-config
+                key: mariadb-url
+      imagePullSecrets:
+        - name: myregistrykey
