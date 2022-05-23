@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb-deploy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mariadb-deploy
+    spec:
+      containers:
+      - image: mariadb
+        name: mariadb-deploy
+        env:
+          - name: MARIADB_USER
+            valueFrom:
+              secretKeyRef:
+                name: secret
+                key: user
+          - name: MARIADB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secret
+                key: password
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mariadb-persistent-storage
+          mountPath: /var/lib/mariadb
+      volumes:
+      - name: mariadb-persistent-storage
+        persistentVolumeClaim:
+          claimName: mariadb-pv-claim
