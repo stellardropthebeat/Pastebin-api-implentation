@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-rec
+  labels:
+    app: backend-rec
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-rec
+  template:
+    metadata:
+      labels:
+        app: backend-rec
+    spec:
+      containers:
+      - name: backend-rec
+        image: ghcr.io/cs-muic/scalable-p1-stellardropthebeat/p1-backend
+        # TODO connect database to backend
+        env:
+        - name: ELASTIC_HOST
+          value: elasticsearch.default.svc
