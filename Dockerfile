@@ -13,6 +13,7 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # start app
-CMD [ "python3", "./backend/app.py" ]
+CMD [ "poetry", "run", "gunicorn", "-w", "4", "-b", "127.0.0.1:5000", "app:app" ]
+
 
 
