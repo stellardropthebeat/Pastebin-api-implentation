@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # start app
-CMD [ "gunicorn", "-w", "4", "-b" , "127.0.0.1:5000", "backend.app:app" ]
+CMD [ "gunicorn", "-w", "4", "--reload", "-b" , "127.0.0.1:5000", "backend.app:app" ]
 
 
 

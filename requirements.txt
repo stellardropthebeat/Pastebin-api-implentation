@@ -3,3 +3,4 @@ sqlalchemy~=1.4
 mariadb==1.0.11
 sqlalchemy-utils
 gunicorn
+locust~=2.9.0
