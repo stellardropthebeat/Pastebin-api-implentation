@@ -96,5 +96,3 @@ def getId(Id):
 def getRecents():
     return json.dumps(selectRecents())
 
-
-app.run(host='0.0.0.0', port=5000, debug=True)
