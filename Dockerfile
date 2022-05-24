@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # start app
-CMD [ "python", "./backend/app.py" ]
+CMD [ "python3", "./backend/app.py" ]
 
 
 
