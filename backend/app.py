@@ -1,6 +1,5 @@
 import json
 import os
-from waitress import serve
 from flask import Flask, request, jsonify
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String, create_engine
@@ -98,5 +97,4 @@ def getRecents():
     return json.dumps(selectRecents())
 
 
-if __name__ == "main":
-    serve(app, host="0.0.0.0", port=5000)
+app.run(host='0.0.0.0', port=5000, debug=True)
