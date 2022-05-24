@@ -1,7 +1,5 @@
 import json
 import os
-
-import config
 from flask import Flask, request, jsonify
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String, create_engine
