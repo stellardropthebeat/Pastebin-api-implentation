@@ -1,5 +1,6 @@
 import json
 import os
+from waitress import serve
 from flask import Flask, request, jsonify
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String, create_engine
@@ -12,7 +13,9 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # Define the MariaDB engine using MariaDB Connector/Python
-engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin")
+engine = sqlalchemy.create_engine(
+    "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" +
+    os.environ["MARIADB_DATABASE"] + "/pastebin")
 
 # Create database if it does not exist.
 if not database_exists(engine.url):
@@ -94,3 +97,6 @@ def getId(Id):
 def getRecents():
     return json.dumps(selectRecents())
 
+
+if __name__ == "main":
+    serve(app, host="0.0.0.0", port=5000)
