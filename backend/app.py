@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # Define the MariaDB engine using MariaDB Connector/Python
-engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"]+ "/pastebin")
+engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin")
 
 # Create database if it does not exist.
 if not database_exists(engine.url):
