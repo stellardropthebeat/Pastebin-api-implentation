@@ -7,7 +7,7 @@ from sqlalchemy import Column, Text, DateTime, Integer, String
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ[
-    "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin"
+    "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"]
 db = SQLAlchemy(app)
 
 
