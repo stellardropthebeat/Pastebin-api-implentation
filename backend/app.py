@@ -4,10 +4,15 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String
+from sqlalchemy_utils import database_exists, create_database
+
+url = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ[
+    "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin"
+if not database_exists(url):
+    create_database(url)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ[
-    "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"]
+app.config['SQLALCHEMY_DATABASE_URI'] = url
 db = SQLAlchemy(app)
 
 
@@ -19,15 +24,7 @@ class Paste(db.Model):
     createdAt = Column(DateTime, default=datetime.now)
 
 
-def __init__(self, id, title, content, createdAt):
-    self.id = id
-    self.title = title
-    self.content = content
-    self.createdAt = createdAt
-
-
 db.create_all()
-
 
 # def selectById(Id):
 #    return Paste.query.get(Id)
@@ -69,7 +66,7 @@ def getId(Id):
     if paste is None:
         return '', 404
     else:
-        return json.dumps({
+        return jsonify({
             "title": paste.title,
             "content": paste.content,
             "createdAt": str(paste.createdAt)
