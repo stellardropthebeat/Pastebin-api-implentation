@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ[
     "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin"
@@ -27,11 +26,14 @@ def __init__(self, id, title, content, createdAt):
     self.createdAt = createdAt
 
 
-#def selectById(Id):
+db.create_all()
+
+
+# def selectById(Id):
 #    return Paste.query.get(Id)
 #
 #
-#def selectRecents():
+# def selectRecents():
 #    recents = Paste.query.order_by(Paste.id.desc()).limit(100)
 #    toReturn = []
 #    for p in recents:
@@ -85,4 +87,5 @@ def getRecents():
 
 if __name__ == "__main__":
     from waitress import serve
+
     serve(app, host="0.0.0.0", port=5000)
