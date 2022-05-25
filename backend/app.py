@@ -1,30 +1,18 @@
 import json
 import os
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy import Column, Text, DateTime, Integer, String, create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy_utils import database_exists, create_database
-import sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Text, DateTime, Integer, String
+
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
-
-# Define the MariaDB engine using MariaDB Connector/Python
-engine = sqlalchemy.create_engine("mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ["MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin")
-
-# Create database if it does not exist.
-if not database_exists(engine.url):
-    create_database(engine.url)
-else:
-    # Connect the database if exists.
-    engine.connect()
-
-Base = declarative_base()
+app.config['SQLALCHEMY_DATABASE_URI'] = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.environ[
+    "MARIADB_ROOT_PASSWORD"] + "@" + os.environ["MARIADB_DATABASE"] + "/pastebin"
+db = SQLAlchemy(app)
 
 
-class Paste(Base):
+class Paste(db.Model):
     __tablename__ = 'pastebin'
     id = Column(Integer, primary_key=True)
     title = Column(String(length=100))
@@ -32,27 +20,26 @@ class Paste(Base):
     createdAt = Column(DateTime)
 
 
-Base.metadata.create_all(engine)
-
-# Create a session
-Session = sqlalchemy.orm.sessionmaker()
-Session.configure(bind=engine)
-session = Session()
+def __init__(self, id, title, content, createdAt):
+    self.id = id
+    self.title = title
+    self.content = content
+    self.createdAt = createdAt
 
 
 def addPaste(title, content, createdAt):
     newPaste = Paste(title=title, content=content, createdAt=createdAt)
-    session.add(newPaste)
-    session.commit()
+    db.session.add(newPaste)
+    db.session.commit()
     return newPaste.id
 
 
 def selectById(Id):
-    return session.query(Paste).get(Id)
+    return Paste.query.get(Id)
 
 
 def selectRecents():
-    recents = session.query(Paste).order_by(Paste.id.desc()).limit(100)
+    recents = Paste.query.order_by(Paste.id.desc()).limit(100)
     toReturn = []
     for p in recents:
         toReturn.append(({"title": p.title, "content": p.content, "createdAt": str(p.createdAt)}))
