@@ -26,17 +26,6 @@ class Paste(db.Model):
 
 db.create_all()
 
-# def selectById(Id):
-#    return Paste.query.get(Id)
-#
-#
-# def selectRecents():
-#    recents = Paste.query.order_by(Paste.id.desc()).limit(100)
-#    toReturn = []
-#    for p in recents:
-#        toReturn.append(({"title": p.title, "content": p.content, "createdAt": str(p.createdAt)}))
-#    return toReturn
-
 
 @app.route('/')
 def index():
