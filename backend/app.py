@@ -65,10 +65,8 @@ def getId(Id):
 @app.route('/api/recents', methods=["POST"])
 def getRecents():
     recents = Paste.query.order_by(Paste.id.desc()).limit(100)
-    toReturn = []
-    for p in recents:
-        toReturn.append(({"title": p.title, "content": p.content, "createdAt": str(p.createdAt)}))
-    return json.dumps(toReturn)
+    json_string = json.dumps([ob.__dict__ for ob in recents])
+    return json_string
 
 
 if __name__ == "__main__":
