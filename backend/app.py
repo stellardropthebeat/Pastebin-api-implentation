@@ -2,6 +2,7 @@ import json
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_caching import Cache
 from datetime import datetime
 from sqlalchemy import Column, Text, DateTime, Integer, String
 from sqlalchemy_utils import database_exists, create_database
@@ -11,8 +12,11 @@ url = "mariadb+mariadbconnector://" + os.environ["MARIADB_USER"] + ":" + os.envi
 if not database_exists(url):
     create_database(url)
 
+cache = Cache()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = url
+app.config['CACHE_TYPE'] = 'simple'
+cache.init_app(app)
 db = SQLAlchemy(app)
 
 
@@ -63,10 +67,14 @@ def getId(Id):
 
 
 @app.route('/api/recents', methods=["POST"])
+@cache.cached(timeout=1)
 def getRecents():
     recents = Paste.query.order_by(Paste.id.desc()).limit(100)
-    json_string = json.dumps([ob.__dict__ for ob in recents])
-    return json_string
+    toReturn = []
+    for p in recents:
+        toReturn.append(({"title": p.title, "content": p.content, "createdAt": str(p.createdAt)}))
+
+    return json.dumps(toReturn)
 
 
 if __name__ == "__main__":
