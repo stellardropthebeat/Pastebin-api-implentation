@@ -1,1 +1,1 @@
-# Pastebin-api-implentation project (Scalable systems)
+# pastebin-api-implentation project (Scalable systems)
